@@ -23,10 +23,10 @@ func main() {
 	}
 
 	for {
-		nodeList, err := clientset.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{})
+		res, err := clientset.CoreV1().Services("ohmyfans").Get(context.Background(), "subs-rpc", metav1.GetOptions{})
 		fmt.Println(err)
-		fmt.Println(nodeList)
-		time.Sleep(2 * time.Second)
+		fmt.Println(res)
+		time.Sleep(time.Second * 2)
 	}
 
 }
