@@ -23,10 +23,10 @@ func main() {
 	}
 
 	for {
-		res, err := clientset.CoreV1().Services("ohmyfans").Get(context.Background(), "subs-rpc-svc", metav1.GetOptions{})
+		endpoints, err := clientset.CoreV1().Endpoints("ohmyfans").Get(context.Background(), "subs-rpc-svc", metav1.GetOptions{})
 		fmt.Println(err)
-		fmt.Println(res)
-		time.Sleep(time.Second * 2)
+		fmt.Println(endpoints)
+		time.Sleep(2 * time.Second)
 	}
 
 }
