@@ -41,9 +41,9 @@ func main() {
 	fmt.Println(err)
 
 	var wg sync.WaitGroup
+	wg.Add(1)
 
 	go func() {
-		wg.Add(1)
 		for {
 			select {
 			case event, ok := <-watcher.ResultChan():
