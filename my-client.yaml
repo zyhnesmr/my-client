@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-client
+  namespace: ohmyfans
+  labels:
+    app: my-client
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: my-client
+  template:
+    metadata:
+      labels:
+        app: my-client
+    spec:
+      serviceAccountName: ohmyfans-discovery
+      containers:
+        - name: my-client
+          image: ${IMAGE}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8888
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+          volumeMounts:
+            - name: timezone
+              mountPath: /etc/localtime
+      imagePullSecrets:
+        - name: pull-secret
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
