@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -39,7 +40,10 @@ func main() {
 	})
 	fmt.Println(err)
 
+	var wg sync.WaitGroup
+
 	go func() {
+		wg.Add(1)
 		for {
 			select {
 			case event, ok := <-watcher.ResultChan():
@@ -80,5 +84,8 @@ func main() {
 				}
 			}
 		}
+		wg.Done()
 	}()
+
+	wg.Wait()
 }
