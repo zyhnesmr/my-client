@@ -35,7 +35,7 @@ func (m *MyBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts r
 		return nil, errors.New("wrong schema")
 	}
 	var svc, p = splits[0], splits[1]
-	port, err := strconv.ParseInt(p, 10, 10)
+	port, err := strconv.ParseInt(p, 10, 64)
 	if err != nil {
 		return nil, err
 	}
