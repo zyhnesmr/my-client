@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,34 +25,43 @@ func main() {
 		panic(err)
 	}
 
-	//endpoints, err := clientset.CoreV1().Endpoints("ohmyfans").Get(context.Background(), "subs-rpc-svc", metav1.GetOptions{})
-	//fmt.Println(err)
-	//fmt.Println(endpoints)
-	//time.Sleep(2 * time.Second)
-	//
-	//for _,subset:=range endpoints.Subsets{
-	//	for _,address:=range subset.Addresses{
-	//		fmt.Println(address.IP)
-	//	}
-	//}
-
-	watcher, err := clientset.CoreV1().Endpoints("ohmyfans").Watch(context.Background(), metav1.ListOptions{
-		FieldSelector: "metadata.name=" + "subs-rpc-svc",
-	})
-	fmt.Println(err)
-
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	go func() {
-		for {
-			select {
-			case event, ok := <-watcher.ResultChan():
-				if !ok {
-					fmt.Println("Endpoints watcher channel closed.")
-					return
-				}
+	go Monitor(clientset, &wg)
 
+	wg.Wait()
+}
+
+func Monitor(clientset *kubernetes.Clientset, wg *sync.WaitGroup) {
+	defer wg.Done()
+	watcher, err := clientset.CoreV1().Endpoints("ohmyfans").Watch(context.Background(), metav1.ListOptions{
+		FieldSelector: "metadata.name=" + "subs-rpc-svc",
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	for {
+		select {
+		case event, ok := <-watcher.ResultChan():
+			if !ok {
+				fmt.Println("Endpoints watcher channel not ok")
+				fmt.Println(event)
+				fmt.Println("-----new watcher-------")
+
+				for {
+					watcher, err = clientset.CoreV1().Endpoints("ohmyfans").Watch(context.Background(), metav1.ListOptions{
+						FieldSelector: "metadata.name=" + "subs-rpc-svc",
+					})
+					if err == nil {
+						break
+					}
+					time.Sleep(time.Second * 1)
+				}
+				fmt.Println("regen watcher")
+			} else {
 				eds, ok := event.Object.(*corev1.Endpoints)
 				if !ok {
 					fmt.Println("not endpoints")
@@ -79,13 +89,8 @@ func main() {
 							fmt.Println(address.IP)
 						}
 					}
-				default:
-					break
 				}
 			}
 		}
-		wg.Done()
-	}()
-
-	wg.Wait()
+	}
 }

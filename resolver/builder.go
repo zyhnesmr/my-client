@@ -7,6 +7,9 @@ type MyBuilder struct {
 }
 
 func (m *MyBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
+	cc.UpdateState(resolver.State{
+		//Addresses: []string{},
+	})
 	return nil, nil
 }
 
