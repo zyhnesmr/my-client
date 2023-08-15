@@ -12,7 +12,7 @@ import (
 
 func main() {
 
-	clientConn, err := grpc.Dial("omf://ohmyfans/subs-rpc-svc:9091", grpc.WithInsecure())
+	clientConn, err := grpc.Dial("omf://ohmyfans/subs-rpc-svc:9091", grpc.WithInsecure(), grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`))
 	if err != nil {
 		panic(err)
 	}
