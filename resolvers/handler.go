@@ -1,4 +1,4 @@
-package resolver
+package resolvers
 
 import (
 	"sync"
@@ -10,6 +10,11 @@ type EventHandler struct {
 	update    func([]string)
 	endpoints map[string]struct{}
 	lock      sync.Mutex
+}
+
+func NewEventHandler(update func([]string)) *EventHandler {
+	var ed = make(map[string]struct{})
+	return &EventHandler{update: update, endpoints: ed}
 }
 
 func (m *EventHandler) OnAdd(ends *corev1.Endpoints) {

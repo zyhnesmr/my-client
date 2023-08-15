@@ -1,0 +1,107 @@
+syntax = "proto3";
+option go_package="github.com/ohmyfans/ohmyfans-be-subscribe-rpc/subs";
+package subs;
+
+//goctl rpc protoc subscribes.proto --style go_zero --go_out=../subs --go_opt=paths=source_relative --go-grpc_out=../subs --go-grpc_opt=paths=source_relative --zrpc_out=../
+
+
+service Subscribe{
+  /*添加关注分组*/
+  rpc AddGroup(AddGroupReq)returns(AddGroupResp);
+  /*删除关注分组*/
+  rpc DeleteGroup(DeleteGroupReq)returns(Empty);
+  /*获取用户的所有关注分组*/
+  rpc GetGroupList(UserId)returns(GroupList);
+  /*为一个订阅设置分组*/
+  rpc SetGroups(SetGroupsReq)returns(Empty);
+  /*修改分组名称*/
+  rpc UpdateGroupName(UpdateGroupNameReq)returns(Empty);
+
+  /*订阅*/
+  rpc Subscribe(SubscribeReq)returns(Empty);
+  /*取消订阅*/
+  rpc UnSubscribe(UnSubscribeReq)returns(Empty);
+  /*查询一个用户是否订阅另一个用户*/
+  rpc VerifySubscribe(VerifySubscriptionReq)returns(Empty);
+  /*查询分组下的订阅列表 分页*/
+  rpc QueryAttentionByGroup(QueryAttentionByGroupReq)returns(QueryAttentionResp);
+  /*查询粉丝列表 分页*/
+  rpc QueryFollowList(QueryFollowerList)returns(QueryFollowResp);
+  /*从关注列表移除-软删除 设置status*/
+  rpc RemoveFromAttentionList(RemoveAttentionReq)returns(Empty);
+}
+message Empty{}
+
+message AddGroupReq{
+  int64 id  = 1;
+  string groupName = 2;
+}
+message AddGroupResp{
+  int64 groupId = 1;
+}
+message DeleteGroupReq{
+  int64 id = 1;
+  int64 groupId = 2;
+}
+message UserId{
+  int64 id = 1;
+}
+message Group{
+  int64 id = 1;
+  string groupName = 2;
+  int64 count = 3;
+}
+message GroupList{
+  repeated Group groupList = 1;
+}
+message SetGroupsReq{
+  int64 id = 1;
+  int64 attentionId = 2;
+  repeated int64 groups = 3;
+}
+message UpdateGroupNameReq{
+  int64 id = 1;
+  int64 groupId = 2;
+  string newGroupName = 3;
+}
+
+
+message SubscribeReq{
+  int64 id = 1;
+  int64 attentionId = 2;
+  repeated int64 groups = 3;
+}
+message UnSubscribeReq{
+  int64 id = 1;
+  int64 attentionId = 2;
+}
+message VerifySubscriptionReq{
+  int64 followId = 1;
+  int64 attentionId = 2;
+}
+message NullInt64{
+  int64 value = 1;
+}
+message QueryAttentionByGroupReq{
+  int64 id = 1;
+  int64 groupId = 2;
+  int64 pageSize = 3;
+  int64 lastTime = 4;
+}
+message QueryFollowerList{
+  int64 id = 1;
+  int64 pageSize = 2;
+  int64 lastTime = 3;
+}
+message QueryAttentionResp{
+  repeated int64 attentions =  1;
+  int64 lastTime = 2;
+}
+message QueryFollowResp{
+  repeated int64 follows = 1;
+  int64 lastTime = 2;
+}
+message RemoveAttentionReq{
+  int64 id = 1;
+  int64 attentionId = 2;
+}
