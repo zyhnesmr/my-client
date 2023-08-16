@@ -1,0 +1,31 @@
+syntax = "v1"
+
+info(
+	title: "type title here"
+	desc: "type desc here"
+	author: "type author here"
+	email: "type email here"
+	version: "type version here"
+)
+
+// goctl api go --api oss.api --dir ./ --style go_zero
+type OSSCallBackReq {
+	Bucket    string `json:"bucket,optional"`
+	Object    string `json:"object,optional"`
+	ClientIP  string `json:"clientIp,optional"`
+	ReqId     string `json:"reqId,optional"`
+	Operation string `json:"operation,optional"`
+}
+type OSSCallBackResp {
+	Bucket    string `json:"bucket"`
+	Object    string `json:"object"`
+	ClientIP  string `json:"clientIp"`
+	ReqId     string `json:"reqId"`
+	Operation string `json:"operation"`
+}
+
+service oss-api{
+	@doc "阿里云回调接口"
+	@handler OssCallBack
+	post /oss/callback(OSSCallBackReq)returns(OSSCallBackResp)
+}
